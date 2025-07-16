@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditorInternal; // Required for tag management
+using System.IO; // For Path operations
 using UnityEngine;
 using UnityMcpBridge.Editor.Helpers; // For Response class
 
@@ -124,6 +125,10 @@ namespace UnityMcpBridge.Editor.Tools
                     return RemoveLayer(layerName);
                 case "get_layers":
                     return GetLayers(); // Helper to list current layers
+
+                // UnityMcpServer Path
+                case "get_server_path":
+                    return GetServerPath();
 
                 // --- Settings (Example) ---
                 // case "set_resolution":
@@ -532,6 +537,22 @@ namespace UnityMcpBridge.Editor.Tools
             catch (Exception e)
             {
                 return Response.Error($"Failed to retrieve layers: {e.Message}");
+            }
+        }
+
+        // --- UnityMcpServer Path Method ---
+        private static object GetServerPath()
+        {
+            try
+            {
+                string directory = ServerInstaller.GetServerPath();
+                string serverPy = Path.Combine(directory, "server.py");
+                var result = new { directory, serverPy };
+                return Response.Success("Retrieved UnityMcpServer path.", result);
+            }
+            catch (Exception e)
+            {
+                return Response.Error($"Failed to retrieve server path: {e.Message}");
             }
         }
 
